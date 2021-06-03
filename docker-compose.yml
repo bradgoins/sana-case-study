@@ -1,0 +1,49 @@
+version: "3"
+services:
+  ui:
+    image: node:14
+    volumes:
+      - ./ui/:/usr/src/service
+    environment:
+      - NODE_ENV=development
+    working_dir: /usr/src/service
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    depends_on:
+      - api
+    command: >
+      bash -c "npm install 
+      && npm start"
+
+  api:
+    image: node:12
+    volumes:
+      - ./api/:/usr/src/service
+    environment:
+      - DATABASE_URL=mongodb://database/sana
+      - PRIVATE_KEY="mYcoOlSeCrEtKeY"
+    working_dir: /usr/src/service
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    depends_on:
+      - database
+    command: >
+      bash -c "npm install -g nodemon
+      && npm install
+      && npm run start -host 0.0.0.0"
+
+  database:
+    image: mongo:4.0.4
+    ports:
+      - 27017:27017
+    expose:
+      - 27017
+    volumes:
+      - sana_mongo_volume:/data/db
+
+volumes:
+  sana_mongo_volume:
